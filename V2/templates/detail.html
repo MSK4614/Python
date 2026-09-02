@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- 返回按钮 -->
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mb-3">
+        ← 返回首页
+    </a>
+
+    {% if partner %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ partner.title }}</h4>
+            <!-- 状态标签 -->
+            <span class="badge fs-6 
+                {% if partner.status == '招募中' %}bg-success
+                {% elif partner.status == '已满员' %}bg-warning text-dark
+                {% else %}bg-danger{% endif %}">
+                {{ partner.status }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>🏷️ 分类：</strong> <span class="badge bg-secondary">{{ partner.category }}</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>📍 地点：</strong> {{ partner.location }}</p>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>⏰ 时间：</strong> {{ partner.time }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>📅 发布时间：</strong> {{ partner.created_at or '未知' }}</p>
+                </div>
+            </div>
+            <hr>
+            <p class="mb-1"><strong>📝 详细描述：</strong></p>
+            <p class="text-muted">{{ partner.description }}</p>
+        </div>
+
+        <!-- 管理员专属操作区 -->
+        {% if g.get('is_admin_mode') %}
+        <div class="card-footer bg-light">
+            <form action="{{ url_for('update_status', partner_id=partner.id) }}" method="POST" class="d-flex align-items-center gap-2">
+                <label for="status" class="fw-bold mb-0">快速修改状态：</label>
+                    <select name="status" id="status" class="form-select form-select-sm w-auto">
+                        <option value="招募中" {% if partner.status == '招募中' %}selected{% endif %}>招募中</option>
+                        <option value="已满员" {% if partner.status == '已满员' %}selected{% endif %}>已满员</option>
+                        <option value="已结束" {% if partner.status == '已结束' %}selected{% endif %}>已结束</option>
+                    </select>
+                <button type="submit" class="btn btn-warning btn-sm">更新</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <!-- 找不到数据时的提示 -->
+    <div class="alert alert-danger mt-3">
+        ❌ 抱歉，未找到该搭子信息，可能已被删除。
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
